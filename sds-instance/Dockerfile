@@ -22,9 +22,11 @@ ENV TDS_DIR /opt/ibm/ldap/V${TDS_VERSION}
 
 # Run all commands in a single RUN layer to minimize the size of the image.
 # Updates Linux. Includes i386
-RUN \
+CMD \
   # Create SDS instance user
   useradd -m -d /home/${SDS_USER} -u 508 -g idsldap ${SDS_USER} -p $(openssl passwd -1 ${SDS_PASSWD}) && \
+  chown ${SDS_USER}:idsldap /home/${SDS_USER} && \
+  chmod g+w /home/${SDS_USER} && \
   #echo ${SDS_USER}:${SDS_PASSWD} | chgpasswd && \
   # Create instance
   ${TDS_DIR}/sbin/idsicrt -I ${SDS_USER} -p 389 -s 636 -n -l /home/${SDS_USER} -e 123456789012  -g 123456789012 -t ${SDS_USER} && \
@@ -32,6 +34,5 @@ RUN \
   ${TDS_DIR}/sbin/idsdnpw -I ${SDS_USER} -n -p ${CN_ROOT_PWD} && \
   ${TDS_DIR}/sbin/idscfgsuf -I ${SDS_USER} -n -s ${SUFFIX} && \
   cd ${TDS_DIR}/sbin && \
-  ./ibmslapd -I ${SDS_USER} && \
-  rm -rf ${TDS_INST_DIR}
+  ./ibmslapd -I ${SDS_USER} 
 

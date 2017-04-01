@@ -25,9 +25,9 @@ COPY sds/images/*.rpm ${TDS_INST_DIR}/
 
 # Run all commands in a single RUN layer to minimize the size of the image.
 # Updates Linux. Includes i386
-RUN ls ${TDS_INST_DIR} && \
+RUN \
 # Install pre-request
-#  yum -y install ksh && \
+  yum -y install openssl && \
   groupadd -g 507 idsldap && \
   useradd -m -d /home/idsldap -u 507 -g idsldap idsldap && \
 # Install and remove the installer.
@@ -35,8 +35,7 @@ RUN ls ${TDS_INST_DIR} && \
   ./idsLicense --quiet && \
   cd ${TDS_INST_DIR}/ && \
   rpm -ivh gsk*.rpm && \
-  rpm -ivh ids*.rpm && \
+  rpm -ivh --force ids*.rpm && \
   cd ${TDS_DIR}/sbin && \
   ./ibmslapd -v && \
   rm -rf ${TDS_INST_DIR}
-

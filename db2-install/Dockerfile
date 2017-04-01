@@ -4,7 +4,7 @@
 # Version: 2017-03-28
 # Author: Macho Zhao
 
-FROM centos:6.8
+FROM centos:7
 
 MAINTAINER Macho Zhao <machozhao@gmail.com>
 
@@ -43,6 +43,8 @@ RUN ls && \
   ./db2prereqcheck -l && \
   ( ./db2setup -r /tmp/${DB2_RESP_FILE} && \
   cat /tmp/db2setup.log || cat /tmp/db2setup.log ) && \
+  ${DB2_DIR}/adm/db2licm -a ./db2/license/db2ese_o.lic && \
+  ${DB2_DIR}/adm/db2licm -l && \
 #  ${DB2_DIR}/bin/db2val -o && \
   cd && \
   rm /tmp/${DB2_RESP_FILE} && \
