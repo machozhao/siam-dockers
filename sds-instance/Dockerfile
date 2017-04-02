@@ -20,21 +20,11 @@ ENV TDS_VERSION 6.4
 ## Name of the response file included in the Docker image.
 ENV TDS_DIR /opt/ibm/ldap/V${TDS_VERSION}
 
+COPY com_suffix.ldif /tmp
+COPY create_or_start.sh ${TDS_DIR}
+
 # Run all commands in a single RUN layer to minimize the size of the image.
 # Updates Linux. Includes i386
-CMD \
-  # Create SDS instance user
-  useradd -m -d /home/${SDS_USER} -u 508 -g idsldap ${SDS_USER} -p $(openssl passwd -1 ${SDS_PASSWD}) && \
-  chown ${SDS_USER}:idsldap /home/${SDS_USER} && \
-  chmod g+w /home/${SDS_USER} && \
-  #echo ${SDS_USER}:${SDS_PASSWD} | chgpasswd && \
-  # Create instance
-  ${TDS_DIR}/sbin/idsicrt -I ${SDS_USER} -p 389 -s 636 -n -l /home/${SDS_USER} -e 123456789012  -g 123456789012 -t ${SDS_USER} && \
-  ${TDS_DIR}/sbin/idscfgdb -I ${SDS_USER} -l /home/${SDS_USER} -a ${SDS_USER} -n -w ${SDS_PASSWD} -t ${SDS_USER} -f /home/${SDS_USER}/idsslapd-${SDS_USER}/etc/ibmslapd.conf && \
-  ${TDS_DIR}/sbin/idsdnpw -I ${SDS_USER} -n -p ${CN_ROOT_PWD} && \
-  ${TDS_DIR}/sbin/idscfgsuf -I ${SDS_USER} -n -s ${SUFFIX} && \
-  cd ${TDS_DIR}/sbin && \
-  ./ibmslapd -I ${SDS_USER}  && \
-  tail -f /home/timldap/idsslapd-timldap/logs/ibmslapd.log
+RUN chmod a+x ${TDS_DIR}/create_or_start.sh
 
-
+CMD ${TDS_DIR}/create_or_start.sh ${SDS_USER} ${SDS_PASSWD}
