@@ -34,5 +34,7 @@ CMD \
   ${TDS_DIR}/sbin/idsdnpw -I ${SDS_USER} -n -p ${CN_ROOT_PWD} && \
   ${TDS_DIR}/sbin/idscfgsuf -I ${SDS_USER} -n -s ${SUFFIX} && \
   cd ${TDS_DIR}/sbin && \
-  ./ibmslapd -I ${SDS_USER} 
+  ./ibmslapd -I ${SDS_USER}  && \
+  tail -f /home/timldap/idsslapd-timldap/logs/ibmslapd.log
+
 
